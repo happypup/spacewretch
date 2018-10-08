@@ -1,0 +1,10 @@
+.three-container {
+  height: 100%;
+  width: 100%;
+}
+
+.three-canvas {
+  height: 100%;
+  width: 100%;
+  background: black;
+}
