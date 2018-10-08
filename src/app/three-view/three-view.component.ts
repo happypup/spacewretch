@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import * as THREE from 'three';
 import PointerLockControls from '../three-imports/PointerLockControls';
+import { CanvasResize } from '../three-extensions/CanvasResize';
 
 @Component({
   selector: 'app-three-view',
@@ -14,6 +15,7 @@ export class ThreeViewComponent implements OnInit {
   camera: THREE.PerspectiveCamera;
   scene: THREE.Scene;
   pointerLockControls: PointerLockControls;
+  canvasResize: CanvasResize;
 
   constructor() { }
 
@@ -26,8 +28,9 @@ export class ThreeViewComponent implements OnInit {
     this.camera.position.z = 10;
     this.scene = new THREE.Scene();
     this.pointerLockControls = new PointerLockControls(this.camera, this.canvas);
+    this.canvasResize = new CanvasResize(this.renderer, this.camera);
 
-    this.resizeCanvasToDisplaySize(true);
+    this.canvasResize.updateFirstTime();
     this.populateScene();
 
     this.canvas.addEventListener('click',
@@ -65,27 +68,10 @@ export class ThreeViewComponent implements OnInit {
     this.scene.add(this.pointerLockControls.getObject());
   }
 
-  resizeCanvasToDisplaySize(force) {
-    const canvas = this.renderer.domElement;
-    // look up the size the canvas is being displayed
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-
-    // adjust displayBuffer size to match
-    if (force || canvas.width !== width || canvas.height !== height) {
-      // you must pass false here or three.js sadly fights the browser
-      this.renderer.setSize(width, height, false);
-      this.camera.aspect = width / height;
-      this.camera.updateProjectionMatrix();
-
-      // update any render target sizes here
-    }
-  }
-
   animate() {
     requestAnimationFrame(this.animate.bind(this));
 
-    this.resizeCanvasToDisplaySize(false);
+    this.canvasResize.updateInAnimate();
 
     this.renderer.render(this.scene, this.camera);
   }
