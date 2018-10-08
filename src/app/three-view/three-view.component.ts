@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import * as THREE from 'three';
+import PointerLockControls from '../three-imports/PointerLockControls';
 
 @Component({
   selector: 'app-three-view',
@@ -12,6 +13,7 @@ export class ThreeViewComponent implements OnInit {
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
   scene: THREE.Scene;
+  pointerLockControls: PointerLockControls;
 
   constructor() { }
 
@@ -23,9 +25,16 @@ export class ThreeViewComponent implements OnInit {
     this.camera.position.y = 5;
     this.camera.position.z = 10;
     this.scene = new THREE.Scene();
+    this.pointerLockControls = new PointerLockControls(this.camera, this.canvas);
 
     this.resizeCanvasToDisplaySize(true);
     this.populateScene();
+
+    this.canvas.addEventListener('click',
+      (event) => { this.pointerLockControls.lock(); },
+      false
+    );
+
     this.animate();
   }
 
@@ -52,6 +61,8 @@ export class ThreeViewComponent implements OnInit {
     // create ground
     const plane = new THREE.GridHelper(100, 100);
     this.scene.add(plane);
+
+    this.scene.add(this.pointerLockControls.getObject());
   }
 
   resizeCanvasToDisplaySize(force) {
